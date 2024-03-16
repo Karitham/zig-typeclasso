@@ -40,7 +40,7 @@ fn Tuple(comptime T: type) type {
         left: T,
         right: T,
 
-        pub fn fmap(self: Self, f: fn (T) T) Self {
+        pub fn fmap(self: Self, B: type, f: fn (T) B) Tuple(B) {
             return Self{
                 .left = f(self.left),
                 .right = f(self.right),
@@ -56,7 +56,7 @@ fn scaleN(Container: type, Inner: type, n: Inner) fn (Container) Container {
 
     return struct {
         fn scale(t: Container) Container {
-            return t.fmap(struct {
+            return t.fmap(Inner, struct {
                 fn scale(j: Inner) Inner {
                     return j * n;
                 }
@@ -99,10 +99,10 @@ test ZipList {
         defer zp2.deinit();
 
         try testing.expectEqual(zp2.context.len, 4);
-        try testing.expectEqual(zp2.context[0].just, 2);
-        try testing.expectEqual(zp2.context[1].just, null);
-        try testing.expectEqual(zp2.context[2].just, 6);
-        try testing.expectEqual(zp2.context[3].just, 8);
+        try testing.expectEqual(zp2.context[0].value, 2);
+        try testing.expectEqual(zp2.context[1].value, null);
+        try testing.expectEqual(zp2.context[2].value, 6);
+        try testing.expectEqual(zp2.context[3].value, 8);
     }
 
     {
